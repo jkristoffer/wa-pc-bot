@@ -59,9 +59,9 @@ async function connectToWhatsApp() {
 }
 
 async function handleMessage(sock, message) {
+  console.log('RAW MESSAGE:', JSON.stringify(message.key), JSON.stringify(message.message));
   // Ignore non-message events, own messages, status broadcasts
   if (!message.message) return;
-  if (message.key.fromMe) return;
 
   const jid = message.key.remoteJid;
   if (!jid) return;
