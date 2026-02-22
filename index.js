@@ -9,7 +9,7 @@ import qrcode from 'qrcode-terminal';
 import { isAuthorized } from './lib/auth.js';
 import { sendResponse } from './lib/response.js';
 import { sanitizeInput } from './lib/sanitize.js';
-import { handleCmd, handleStatus } from './handlers/shell.js';
+import { handleCmd, handleStatus, handleUpdate } from './handlers/shell.js';
 import { handleLs, handleFind, handleCat } from './handlers/files.js';
 import { handleClaude, handleClaudeDir } from './handlers/claude.js';
 import { getRandomGreeting } from './handlers/greetings.js';
@@ -125,8 +125,15 @@ async function handleMessage(sock, message) {
         await sock.sendMessage(jid, { text: 'Restarting...' });
         process.exit(1);
         break;
+      case '/update':
+        await sock.sendMessage(jid, { text: 'Pulling latest changes...' });
+        result = await handleUpdate();
+        await sendResponse(sock, jid, result);
+        await sock.sendMessage(jid, { text: 'Restarting...' });
+        process.exit(1);
+        break;
       default:
-        result = { text: `Unknown command: ${command}\nAvailable: /cmd /status /ls /find /cat /claude /claude-dir /restart` };
+        result = { text: `Unknown command: ${command}\nAvailable: /cmd /status /ls /find /cat /claude /claude-dir /restart /update` };
     }
   } catch (err) {
     result = { text: `Error: ${err.message}` };

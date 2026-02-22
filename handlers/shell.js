@@ -11,6 +11,7 @@ const execAsync = promisify(exec);
 
 const CMD_TIMEOUT_MS = parseInt(process.env.CMD_TIMEOUT_MS || '30000', 10);
 const DEFAULT_WORKING_DIR = process.env.DEFAULT_WORKING_DIR || process.cwd();
+const BOT_DIR = new URL('../', import.meta.url).pathname;
 
 export async function handleCmd(args) {
   if (!args) return { text: 'Usage: /cmd <command>' };
@@ -26,6 +27,20 @@ export async function handleCmd(args) {
     const msg = err.killed
       ? `Command timed out after ${CMD_TIMEOUT_MS}ms`
       : (err.stdout || '') + (err.stderr ? `\nSTDERR:\n${err.stderr}` : '') || err.message;
+    return { text: msg.trim() || err.message };
+  }
+}
+
+export async function handleUpdate() {
+  try {
+    const { stdout, stderr } = await execAsync('git pull', {
+      timeout: 30000,
+      cwd: BOT_DIR,
+    });
+    const output = (stdout + (stderr ? `\nSTDERR:\n${stderr}` : '')).trim();
+    return { text: output || '(no output)' };
+  } catch (err) {
+    const msg = (err.stdout || '') + (err.stderr ? `\nSTDERR:\n${err.stderr}` : '') || err.message;
     return { text: msg.trim() || err.message };
   }
 }
