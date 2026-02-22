@@ -12,6 +12,7 @@ import { sanitizeInput } from './lib/sanitize.js';
 import { handleCmd, handleStatus } from './handlers/shell.js';
 import { handleLs, handleFind, handleCat } from './handlers/files.js';
 import { handleClaude, handleClaudeDir } from './handlers/claude.js';
+import { getRandomGreeting } from './handlers/greetings.js';
 
 async function connectToWhatsApp() {
   const { state, saveCreds } = await useMultiFileAuthState('./auth');
@@ -24,7 +25,7 @@ async function connectToWhatsApp() {
 
   sock.ev.on('creds.update', saveCreds);
 
-  sock.ev.on('connection.update', ({ connection, lastDisconnect, qr }) => {
+  sock.ev.on('connection.update', async ({ connection, lastDisconnect, qr }) => {
     if (qr) {
       qrcode.generate(qr, { small: true });
       console.log('\n=== SCAN QR CODE ABOVE ===\n');
@@ -32,6 +33,20 @@ async function connectToWhatsApp() {
 
     if (connection === 'open') {
       console.log('✅ Connected to WhatsApp');
+      const greeting = getRandomGreeting();
+      console.log(`Greeting: ${greeting}`);
+      const allowedNumbers = (process.env.ALLOWED_NUMBERS || '')
+        .split(',')
+        .map(n => n.trim().replace(/^\+/, ''))
+        .filter(Boolean);
+      for (const number of allowedNumbers) {
+        const jid = `${number}@s.whatsapp.net`;
+        try {
+          await sock.sendMessage(jid, { text: greeting });
+        } catch (err) {
+          console.error(`Failed to send greeting to ${jid}:`, err.message);
+        }
+      }
     }
 
     if (connection === 'close') {
