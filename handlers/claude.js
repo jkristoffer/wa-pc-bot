@@ -30,6 +30,10 @@ export async function handleClaude(sock, jid, args) {
   });
 }
 
+export function getClaudeDir() {
+  return claudeWorkingDir;
+}
+
 export function handleClaudeDir(args) {
   if (!args) return { text: 'Usage: /claude-dir <path>' };
 
