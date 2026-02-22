@@ -1,7 +1,11 @@
 import 'dotenv/config';
 import { exec } from 'child_process';
 import os from 'os';
+import { readFileSync } from 'fs';
 import { promisify } from 'util';
+import { getClaudeDir } from './claude.js';
+
+const { version } = JSON.parse(readFileSync(new URL('../package.json', import.meta.url)));
 
 const execAsync = promisify(exec);
 
@@ -46,10 +50,12 @@ export async function handleStatus() {
   }
 
   const text = [
+    `Version:     ${version}`,
     `Hostname:    ${os.hostname()}`,
     `Uptime:      ${uptimeStr}`,
     `Memory:      ${freeMem}MB free / ${totalMem}MB total`,
     `Load avg:    ${load}`,
+    `Claude dir:  ${getClaudeDir()}`,
     `Disk (df -h /):`,
     disk,
   ].join('\n');
