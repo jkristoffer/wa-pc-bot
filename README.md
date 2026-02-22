@@ -19,6 +19,7 @@ A WhatsApp bot for remote PC control via commands.
 | `/cat <file>` | Read file contents |
 | `/claude <prompt>` | Run Claude CLI with prompt |
 | `/claude-dir <path>` | Set Claude working directory |
+| `/restart` | Restart the bot process (pm2/systemd will revive it) |
 
 ## Environment Variables
 
@@ -32,6 +33,20 @@ A WhatsApp bot for remote PC control via commands.
 | `CLAUDE_TIMEOUT_MS` | Timeout for /claude in ms | 300000 |
 | `MAX_OUTPUT_CHARS` | Max chars before file attachment | 3000 |
 | `MAX_FIND_RESULTS` | Max results from /find | 20 |
+
+## Persistent Running
+
+**pm2:**
+```bash
+pm2 start ecosystem.config.cjs
+pm2 save && pm2 startup
+```
+
+**systemd** (Linux — adjust paths in `wa-bot.service` first):
+```bash
+sudo cp wa-bot.service /etc/systemd/system/
+sudo systemctl enable --now wa-bot
+```
 
 ## Auth
 
