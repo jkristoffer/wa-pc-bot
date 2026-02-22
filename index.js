@@ -108,7 +108,7 @@ async function handleMessage(sock, message) {
         break;
       case '/restart':
         await sock.sendMessage(jid, { text: 'Restarting...' });
-        process.exit(0);
+        process.exit(1);
         break;
       default:
         result = { text: `Unknown command: ${command}\nAvailable: /cmd /status /ls /find /cat /claude /claude-dir /restart` };

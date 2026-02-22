@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node index.js",
+    "loop": "while true; do node index.js; sleep 2; done"
   },
   "keywords": [],
   "author": "",
