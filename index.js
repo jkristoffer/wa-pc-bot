@@ -75,10 +75,7 @@ async function handleMessage(sock, message) {
 
   if (!text.startsWith('/')) return;
 
-  if (!isAuthorized(jid)) {
-    await sock.sendMessage(jid, { text: '⛔ Unauthorized' });
-    return;
-  }
+  if (!isAuthorized(jid)) return;
 
   const sanitized = sanitizeInput(text);
   const spaceIdx = sanitized.indexOf(' ');
