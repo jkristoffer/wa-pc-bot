@@ -4,6 +4,7 @@ import makeWASocket, {
   DisconnectReason,
 } from '@whiskeysockets/baileys';
 import pino from 'pino';
+import qrcode from 'qrcode-terminal';
 
 import { isAuthorized } from './lib/auth.js';
 import { sendResponse } from './lib/response.js';
@@ -25,9 +26,8 @@ async function connectToWhatsApp() {
 
   sock.ev.on('connection.update', ({ connection, lastDisconnect, qr }) => {
     if (qr) {
-      console.log('\n=== SCAN QR CODE BELOW ===');
-      console.log(qr);
-      console.log('==========================\n');
+      qrcode.generate(qr, { small: true });
+      console.log('\n=== SCAN QR CODE ABOVE ===\n');
     }
 
     if (connection === 'open') {
@@ -109,8 +109,12 @@ async function handleMessage(sock, message) {
       case '/claude-dir':
         result = handleClaudeDir(args);
         break;
+      case '/restart':
+        await sock.sendMessage(jid, { text: 'Restarting...' });
+        process.exit(0);
+        break;
       default:
-        result = { text: `Unknown command: ${command}\nAvailable: /cmd /status /ls /find /cat /claude /claude-dir` };
+        result = { text: `Unknown command: ${command}\nAvailable: /cmd /status /ls /find /cat /claude /claude-dir /restart` };
     }
   } catch (err) {
     result = { text: `Error: ${err.message}` };
